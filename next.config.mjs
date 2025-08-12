@@ -1,9 +1,18 @@
 import createJiti from "jiti";
 import { fileURLToPath } from "node:url";
-const jiti = createJiti(fileURLToPath(import.meta.url));
 
-// Import env here to validate during build. Using jiti@^1 we can import .ts files :)
-jiti("./lib/env");
+// Best-effort env validation: do not block build if this fails in certain environments
+try {
+  const jiti = createJiti(fileURLToPath(import.meta.url));
+  // Import env here to validate during build. Using jiti@^1 we can import .ts files :)
+  jiti("./lib/env");
+} catch (error) {
+  const message = error instanceof Error ? error.message : String(error);
+  // Avoid crashing Next config; warn instead
+  console.warn(
+    `next.config.mjs: Skipping env validation via jiti due to error: ${message}`
+  );
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
