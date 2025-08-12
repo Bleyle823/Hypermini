@@ -46,7 +46,16 @@ export const UserProvider = ({
   children,
   autoSignIn = false,
 }: UserProviderProps) => {
-  const { context } = useMiniApp();
+  // Safely get miniapp context, handle case where it's not available
+  let context = null;
+  try {
+    const miniAppContext = useMiniApp();
+    context = miniAppContext.context;
+  } catch (e) {
+    // MiniApp context not available, continue without it
+    context = null;
+  }
+  
   const [error, setError] = useState<Error | null>(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,7 +71,7 @@ export const UserProvider = ({
     refetchOnWindowFocus: false,
     isProtected: true,
     retry: false,
-    enabled: true,
+    enabled: !!context, // Only enable if we have miniapp context
     ...{
       onSuccess: () => {
         setIsSignedIn(true);
@@ -90,8 +99,8 @@ export const UserProvider = ({
       setError(null);
 
       if (!context) {
-        console.error("Not in mini app");
-        throw new Error("Not in mini app");
+        console.error("Not in mini app - sign in only available within Farcaster");
+        throw new Error("Sign in only available within Farcaster");
       }
 
       const referrerFid =
@@ -110,14 +119,16 @@ export const UserProvider = ({
         referrerFid,
         token: result.token,
       });
-    } catch {
-      setError(new Error("Failed to sign in"));
+    } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : "Failed to sign in";
+      setError(new Error(errorMessage));
     } finally {
       setIsLoading(false);
     }
   }, [context, signIn]);
 
   useEffect(() => {
+    // Only attempt auto sign-in if we have a valid miniapp context and autoSignIn is enabled
     if (context && !isSignedIn && !isLoading && autoSignIn && userError) {
       handleSignIn();
     }
