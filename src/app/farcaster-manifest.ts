@@ -10,11 +10,9 @@ const appUrl = getBaseUrl();
 // https://miniapps.farcaster.xyz/docs/guides/publishing#host-a-manifest-file
 export const farcasterManifest: Manifest = {
   accountAssociation: {
-    header:
-      "eyJmaWQiOjI5MjE5NCwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDcyNTU0QTIyNEI0Qjc1Njk2OTdBYWQ1ZUE1YmQ1NzM5ZDAxQzliYzMifQ",
-    payload: "eyJkb21haW4iOiJ0ZW1wbGF0ZS5nYWlhcy54eXoifQ",
-    signature:
-      "MHg0N2YwYzJlZDQ3ZTMwODZiMGVmYjk3ZmQwYWM5NGQxZjk3Mjg4NDg0NTc3MjY4Yjg4Yzk4MjAyODlmMTI4MjkzMGZiNmExYTdhN2IxYWJlMmQxMzNjMDE1YTQ0Y2FkNWU5M2NiNmRiNmZhYzFjNDcyNjI5NDAwZTk5YmExODNiNjFi",
+    "header": "eyJmaWQiOjY3NDc5MiwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDYyRTdhOGRCYjhEODUzOGUxY0RiNUQ4OTMwMzBCYjE2ZUEwMEIyRjIifQ",
+    "payload": "eyJkb21haW4iOiJoeXBlcm1pbmkudmVyY2VsLmFwcCJ9",
+    "signature": "c7fFm8wlNxqF8aL/MTFo76ad+/p9gzEeHeCPgq7djzMT+UvSTqPUjCjb32z/Z+CZjKRmMYSPJwaSoulvGvHdZxw="
   },
   frame: {
     version: "1",
