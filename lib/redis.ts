@@ -7,10 +7,29 @@ if (!env.REDIS_URL || !env.REDIS_TOKEN) {
   );
 }
 
-export const redis =
-  env.REDIS_URL && env.REDIS_TOKEN
-    ? new Redis({
-        url: env.REDIS_URL,
-        token: env.REDIS_TOKEN,
-      })
-    : null;
+function isValidUpstashUrl(url: string | undefined): boolean {
+  if (!url) return false;
+  return /^https:\/\//i.test(url);
+}
+
+function isLikelyPlaceholder(value: string | undefined): boolean {
+  if (!value) return true;
+  const trimmed = value.trim().toLowerCase();
+  return ["", "string", "your_url", "replace_me", "todo"].includes(trimmed);
+}
+
+const shouldInitializeRedis =
+  isValidUpstashUrl(env.REDIS_URL) && !isLikelyPlaceholder(env.REDIS_TOKEN);
+
+export const redis = shouldInitializeRedis
+  ? new Redis({
+      url: env.REDIS_URL as string,
+      token: env.REDIS_TOKEN as string,
+    })
+  : null;
+
+if (!redis) {
+  console.warn(
+    "Upstash Redis is not initialized. Background notifications/webhooks will be disabled in this environment."
+  );
+}

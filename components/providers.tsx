@@ -47,7 +47,7 @@ function SafeMiniAppProvider({ children }: { children: React.ReactNode }) {
 function SafeUserProvider({ children }: { children: React.ReactNode }) {
   return (
     <ErrorBoundary 
-      FallbackComponent={({ children: fallbackChildren }) => <>{fallbackChildren}</>}
+      FallbackComponent={() => null}
       onError={(error) => console.warn("User provider error (non-critical):", error)}
     >
       <UserProvider autoSignIn={false}>{children}</UserProvider>
