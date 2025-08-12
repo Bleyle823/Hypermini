@@ -18,8 +18,8 @@ export function Panel({
         "rounded-xl border bg-card text-card-foreground shadow-sm",
         className,
       )}
-    >
-      {(title || right) && (
+      >
+      {((title ?? right) != null) && (
         <header className="flex items-center justify-between gap-3 border-b px-4 py-2.5">
           <h3 className="text-sm font-semibold tracking-wide text-muted-foreground">
             {title}
