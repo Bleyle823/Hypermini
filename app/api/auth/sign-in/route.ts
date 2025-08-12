@@ -18,8 +18,10 @@ export const POST = async (req: NextRequest) => {
   let expirationTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
   // Verify signature matches custody address and auth address
   try {
+    const derivedOrigin = req.nextUrl?.origin ?? "";
+    const domainSource = env.NEXT_PUBLIC_URL && env.NEXT_PUBLIC_URL.length > 0 ? env.NEXT_PUBLIC_URL : derivedOrigin;
     const payload = await quickAuthClient.verifyJwt({
-      domain: new URL(env.NEXT_PUBLIC_URL).hostname,
+      domain: new URL(domainSource).hostname,
       token: farcasterToken,
     });
     isValidSignature = !!payload;

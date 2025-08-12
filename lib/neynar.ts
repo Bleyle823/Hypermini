@@ -14,7 +14,7 @@ export const fetchUser = async (fid: string): Promise<NeynarUser> => {
     `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fid}`,
     {
       headers: {
-        "x-api-key": env.NEYNAR_API_KEY!,
+        "x-api-key": env.NEYNAR_API_KEY,
       },
     }
   );

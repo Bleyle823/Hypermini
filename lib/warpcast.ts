@@ -8,7 +8,7 @@ import { env } from "@/lib/env";
 export async function getFarcasterManifest() {
   let frameName = "Mini-app Starter";
   let noindex = false;
-  const appUrl = env.NEXT_PUBLIC_URL;
+  const appUrl = env.NEXT_PUBLIC_URL || "";
   if (appUrl.includes("localhost")) {
     frameName += " Local";
     noindex = true;
