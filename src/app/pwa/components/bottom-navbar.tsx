@@ -63,12 +63,28 @@ export function PwaBottomNavbar() {
               key={`bottom-navbar-link-${route}-${index}`}
               href={route}
               className={cn(
-                "hover:bg-muted flex h-full flex-1 flex-col items-center justify-center overflow-hidden",
-                isActive && "underline",
+                "group relative flex h-full flex-1 flex-col items-center justify-center overflow-hidden",
               )}
             >
-              {navSetup[route].icon}
-              <div className="text-xs">{navSetup[route].name}</div>
+              <div
+                className={cn(
+                  "rounded-full p-2 transition-colors group-hover:bg-muted",
+                  isActive && "bg-muted",
+                )}
+              >
+                {navSetup[route].icon}
+              </div>
+              <div
+                className={cn(
+                  "mt-1 text-[11px] text-muted-foreground transition-colors group-hover:text-foreground",
+                  isActive && "text-foreground",
+                )}
+              >
+                {navSetup[route].name}
+              </div>
+              {isActive && (
+                <div className="absolute inset-x-5 bottom-[2px] h-[3px] rounded-full bg-indigo-500/80" />
+              )}
             </Link>
           );
         })}
