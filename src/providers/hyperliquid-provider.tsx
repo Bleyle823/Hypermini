@@ -1,12 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { Hyperliquid } from "hyperliquid";
 
 type NullableString = string | null;
 
 export type HyperliquidConnectionState = {
-  sdk: Hyperliquid | null;
+  sdk: any | null;
   isConnected: boolean;
   isWebSocketConnected: boolean;
   error: NullableString;
@@ -60,7 +59,7 @@ export function HyperliquidProvider({
     null,
   );
   const [referrerCode, setReferrerCode] = React.useState<NullableString>(null);
-  const [sdk, setSdk] = React.useState<Hyperliquid | null>(null);
+  const [sdk, setSdk] = React.useState<any | null>(null);
   const [error, setError] = React.useState<NullableString>(null);
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [isWebSocketConnected, setIsWebSocketConnected] =
@@ -70,6 +69,8 @@ export function HyperliquidProvider({
     try {
       setError(null);
       // Only construct SDK if we have a private key for authenticated methods
+      // Dynamic import to avoid package.json browser export mismatch
+      const { Hyperliquid } = await import("hyperliquid");
       const instance = new Hyperliquid({
         enableWs: true,
         privateKey: privateKey ?? undefined,

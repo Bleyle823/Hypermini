@@ -1,3 +1,5 @@
+"use client";
+
 import { PwaBottomNavbar, bottomNavHeight } from "@/app/pwa/components/bottom-navbar";
 import { PwaSafeArea } from "@/app/pwa/components/safe-area";
 import { PwaTopNavbar, topNavHeight } from "@/app/pwa/components/top-navbar";
