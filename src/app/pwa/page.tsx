@@ -4,8 +4,13 @@ import { PwaTopNavbar, topNavHeight } from "@/app/pwa/components/top-navbar";
 import { Panel } from "@/app/pwa/components/ui/panel";
 import { Button } from "@/app/pwa/components/ui/button";
 import { ChevronDown, MinusIcon, PlusIcon } from "lucide-react";
+import { useHyperliquid } from "@/providers/hyperliquid-provider";
+import * as React from "react";
 
 export default function HomePage() {
+  const { placeOrderExample } = useHyperliquid();
+  const [price, setPrice] = React.useState<string>("");
+  const [size, setSize] = React.useState<string>("");
   return (
     <PwaSafeArea {...{ topNavHeight, bottomNavHeight }}>
       <PwaTopNavbar />
@@ -25,7 +30,28 @@ export default function HomePage() {
           </Panel>
           <div className="grid grid-rows-[auto_auto_1fr] gap-3 sm:gap-4">
             <Panel title="Order Entry" right={<OrderTypeSelector />}>
-              <OrderEntry />
+              <OrderEntry
+                price={price}
+                size={size}
+                setPrice={setPrice}
+                setSize={setSize}
+                onLong={async () => {
+                  await placeOrderExample({
+                    coin: "BTC-PERP",
+                    isBuy: true,
+                    size: size || "0.001",
+                    limitPx: price || "10000",
+                  });
+                }}
+                onShort={async () => {
+                  await placeOrderExample({
+                    coin: "BTC-PERP",
+                    isBuy: false,
+                    size: size || "0.001",
+                    limitPx: price || "10000",
+                  });
+                }}
+              />
             </Panel>
             <Panel title="Orderbook">
               <Orderbook />
@@ -73,29 +99,31 @@ function OrderTypeSelector() {
   );
 }
 
-function OrderEntry() {
+function OrderEntry({
+  price,
+  size,
+  setPrice,
+  setSize,
+  onLong,
+  onShort,
+}: {
+  price: string;
+  size: string;
+  setPrice: (v: string) => void;
+  setSize: (v: string) => void;
+  onLong: () => Promise<void>;
+  onShort: () => Promise<void>;
+}) {
   return (
     <div className="grid gap-3">
-      <LabelRow label="Size">
-        <div className="flex items-center gap-2">
-          <button className="rounded-full border px-2 py-1 text-xs">
-            25%
-          </button>
-          <button className="rounded-full border px-2 py-1 text-xs">
-            50%
-          </button>
-          <button className="rounded-full border px-2 py-1 text-xs">
-            75%
-          </button>
-          <button className="rounded-full border px-2 py-1 text-xs">Max</button>
-        </div>
-      </LabelRow>
       <LabelRow label="Price">
         <div className="flex items-center gap-2">
           <button className="rounded-full border p-2">
             <MinusIcon className="size-4" />
           </button>
           <input
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
             className="h-11 w-full rounded-xl border bg-background px-3 text-sm outline-none ring-0"
             placeholder="Limit price"
           />
@@ -103,6 +131,14 @@ function OrderEntry() {
             <PlusIcon className="size-4" />
           </button>
         </div>
+      </LabelRow>
+      <LabelRow label="Size">
+        <input
+          value={size}
+          onChange={(e) => setSize(e.target.value)}
+          className="h-11 w-full rounded-xl border bg-background px-3 text-sm outline-none ring-0"
+          placeholder="Order size"
+        />
       </LabelRow>
       <LabelRow label="Leverage">
         <div className="flex items-center gap-3">
@@ -117,10 +153,10 @@ function OrderEntry() {
         </div>
       </LabelRow>
       <div className="grid grid-cols-2 gap-2">
-        <Button className="w-full" variant="success">
+        <Button className="w-full" variant="success" onClick={onLong}>
           Long
         </Button>
-        <Button className="w-full" variant="danger">
+        <Button className="w-full" variant="danger" onClick={onShort}>
           Short
         </Button>
       </div>
