@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { HyperliquidProvider, useHyperliquid } from '../../src/providers/hyperliquid-provider';
 import { 
   mockHyperliquidPackage, 
@@ -41,7 +42,7 @@ function TradingInterface() {
       const data = await getSpotPrice(symbol);
       setPriceData(data);
       setPrice(data.price.toFixed(4));
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Price fetch error:', err);
     }
   };

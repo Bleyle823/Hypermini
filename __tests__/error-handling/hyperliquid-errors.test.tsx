@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { HyperliquidProvider, useHyperliquid } from '../../src/providers/hyperliquid-provider';
 import { resetAllMocks } from '../utils/test-helpers';
 
@@ -25,8 +26,8 @@ function ErrorTestComponent() {
     try {
       const data = await getSpotPrice(symbol);
       setResult(`Price: ${data.price}`);
-    } catch (err) {
-      setResult(`Error: ${err.message}`);
+    } catch (err: unknown) {
+      setResult(`Error: ${(err as Error).message}`);
     }
   };
 
@@ -39,8 +40,8 @@ function ErrorTestComponent() {
         limitPx: 1.25
       });
       setResult(`Order: ${result.status}`);
-    } catch (err) {
-      setResult(`Error: ${err.message}`);
+    } catch (err: unknown) {
+      setResult(`Error: ${(err as Error).message}`);
     }
   };
 
@@ -48,8 +49,8 @@ function ErrorTestComponent() {
     try {
       await cancelAllOrders();
       setResult('Cancel: success');
-    } catch (err) {
-      setResult(`Error: ${err.message}`);
+    } catch (err: unknown) {
+      setResult(`Error: ${(err as Error).message}`);
     }
   };
 

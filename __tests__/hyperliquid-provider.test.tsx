@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { HyperliquidProvider, useHyperliquid } from '../src/providers/hyperliquid-provider';
 
 // Mock the hyperliquid import
@@ -284,9 +285,9 @@ describe('HyperliquidProvider', () => {
       await waitFor(() => {
         expect(screen.getByTestId('error')).toHaveTextContent('Private key required to place orders (use testnet only)');
       });
-    } catch (error) {
+    } catch (error: unknown) {
       // Expected error
-      expect(error.message).toContain('Private key required');
+      expect((error as Error).message).toContain('Private key required');
     }
 
     // Try to cancel orders without private key
@@ -295,9 +296,9 @@ describe('HyperliquidProvider', () => {
       await waitFor(() => {
         expect(screen.getByTestId('error')).toHaveTextContent('Private key required to cancel orders (use testnet only)');
       });
-    } catch (error) {
+    } catch (error: unknown) {
       // Expected error
-      expect(error.message).toContain('Private key required');
+      expect((error as Error).message).toContain('Private key required');
     }
   });
 
@@ -329,8 +330,8 @@ describe('HyperliquidProvider', () => {
       try {
         useHyperliquid();
         return <div>Should not render</div>;
-      } catch (error) {
-        return <div>{error.message}</div>;
+      } catch (error: unknown) {
+        return <div>{(error as Error).message}</div>;
       }
     };
 
@@ -341,7 +342,7 @@ describe('HyperliquidProvider', () => {
   it('handles server-side rendering', () => {
     // Mock server environment
     const originalWindow = global.window;
-    delete global.window;
+    delete (global as any).window;
 
     render(
       <HyperliquidProvider>
