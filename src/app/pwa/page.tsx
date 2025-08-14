@@ -5,58 +5,129 @@ import { PwaSafeArea } from "@/app/pwa/components/safe-area";
 import { PwaTopNavbar, topNavHeight } from "@/app/pwa/components/top-navbar";
 import { Panel } from "@/app/pwa/components/ui/panel";
 import { Button } from "@/app/pwa/components/ui/button";
-import { ChevronDown, MinusIcon, PlusIcon } from "lucide-react";
+import { MinusIcon, PlusIcon } from "lucide-react";
 import { useHyperliquid } from "@/providers/hyperliquid-provider";
 import * as React from "react";
 
 export default function HomePage() {
-  const { placeOrderExample } = useHyperliquid();
+  const { getSpotPrice, placeSpotOrder, cancelAllOrders, connect, isConnected } = useHyperliquid();
+  const [symbol, setSymbol] = React.useState<string>("HYPE");
   const [price, setPrice] = React.useState<string>("");
   const [size, setSize] = React.useState<string>("");
+  const [isLimit, setIsLimit] = React.useState<boolean>(true);
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [priceData, setPriceData] = React.useState<{
+    price: number;
+    dayChangePct: string;
+    volume: string;
+  } | null>(null);
+
+  React.useEffect(() => {
+    if (!isConnected) {
+      void connect();
+    }
+  }, [isConnected, connect]);
+
   return (
     <PwaSafeArea {...{ topNavHeight, bottomNavHeight }}>
       <PwaTopNavbar />
       <main className="grid grid-rows-[auto_1fr] gap-3 sm:gap-4">
-        <div className="flex flex-wrap items-center gap-2 px-2 sm:px-0">
-          <Button size="sm">Deposit</Button>
-          <Button size="sm" variant="secondary">
-            Withdraw
-          </Button>
-          <Button size="sm" variant="ghost">
-            Transfers
-          </Button>
-        </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1.15fr_0.85fr] sm:gap-4">
-          <Panel title="BTC-PERP • 24,102.5" right={<SymbolActions />}> 
-            <div className="aspect-[16/9] w-full rounded-lg bg-gradient-to-b from-zinc-900/10 to-zinc-900/20 dark:from-zinc-100/5 dark:to-zinc-100/10" />
+          <Panel
+            title={`${symbol.toUpperCase()}-SPOT ${priceData ? `• ${priceData.price.toFixed(4)} USDC` : ""}`}
+            right={
+              <div className="flex items-center gap-2">
+                <input
+                  value={symbol}
+                  onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+                  className="h-9 w-28 rounded-xl border bg-background px-3 text-xs outline-none"
+                  placeholder="HYPE"
+                />
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={async () => {
+                    setLoading(true);
+                    try {
+                      const data = await getSpotPrice(symbol);
+                      setPriceData(data);
+                      if (!isLimit) {
+                        setPrice("");
+                      } else {
+                        setPrice(String(data.price.toFixed(4)));
+                      }
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                >
+                  {loading ? "Loading..." : "Get Price"}
+                </Button>
+              </div>
+            }
+          >
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="rounded-lg border p-3">
+                <div className="text-xs text-muted-foreground">Last Price</div>
+                <div className="mt-1 text-base font-semibold">
+                  {priceData ? `${priceData.price.toFixed(4)} USDC` : "-"}
+                </div>
+              </div>
+              <div className="rounded-lg border p-3">
+                <div className="text-xs text-muted-foreground">24h Change</div>
+                <div className="mt-1 text-base font-semibold">
+                  {priceData ? `${priceData.dayChangePct}%` : "-"}
+                </div>
+              </div>
+              <div className="rounded-lg border p-3">
+                <div className="text-xs text-muted-foreground">24h Volume</div>
+                <div className="mt-1 text-base font-semibold">
+                  {priceData ? `${priceData.volume} USDC` : "-"}
+                </div>
+              </div>
+              <div className="rounded-lg border p-3">
+                <div className="text-xs text-muted-foreground">Actions</div>
+                <div className="mt-1 flex gap-2">
+                  <Button size="sm" variant="secondary" onClick={() => setIsLimit(false)}>
+                    Market
+                  </Button>
+                  <Button size="sm" onClick={() => setIsLimit(true)}>
+                    Limit
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={async () => void cancelAllOrders()}>
+                    Cancel All
+                  </Button>
+                </div>
+              </div>
+            </div>
           </Panel>
           <div className="grid grid-rows-[auto_auto_1fr] gap-3 sm:gap-4">
-            <Panel title="Order Entry" right={<OrderTypeSelector />}>
+            <Panel title="Order Entry">
               <OrderEntry
+                isLimit={isLimit}
                 price={price}
                 size={size}
                 setPrice={setPrice}
                 setSize={setSize}
                 onLong={async () => {
-                  await placeOrderExample({
-                    coin: "BTC-PERP",
+                  const sz = Number(size || "0.1");
+                  await placeSpotOrder({
+                    coin: symbol,
                     isBuy: true,
-                    size: size || "0.001",
-                    limitPx: price || "10000",
+                    size: sz,
+                    limitPx: isLimit ? Number(price || "0") : null,
                   });
                 }}
                 onShort={async () => {
-                  await placeOrderExample({
-                    coin: "BTC-PERP",
+                  const sz = Number(size || "0.1");
+                  await placeSpotOrder({
+                    coin: symbol,
                     isBuy: false,
-                    size: size || "0.001",
-                    limitPx: price || "10000",
+                    size: sz,
+                    limitPx: isLimit ? Number(price || "0") : null,
                   });
                 }}
               />
-            </Panel>
-            <Panel title="Orderbook">
-              <Orderbook />
             </Panel>
             <Panel title="Positions">
               <Positions />
@@ -69,39 +140,10 @@ export default function HomePage() {
   );
 }
 
-function SymbolActions() {
-  return (
-    <div className="flex items-center gap-2">
-      <Button size="sm" variant="secondary">
-        1m
-      </Button>
-      <Button size="sm" variant="secondary">
-        Indicators
-      </Button>
-      <Button size="sm" variant="secondary">
-        <ChevronDown className="size-4" />
-      </Button>
-    </div>
-  );
-}
-
-function OrderTypeSelector() {
-  return (
-    <div className="flex items-center gap-1 rounded-full bg-muted p-1">
-      <Button size="sm" variant="ghost" className="rounded-full px-3">
-        Market
-      </Button>
-      <Button size="sm" variant="primary" className="rounded-full px-3">
-        Limit
-      </Button>
-      <Button size="sm" variant="ghost" className="rounded-full px-3">
-        Stop
-      </Button>
-    </div>
-  );
-}
+// removed extra UI components not used in spot-only flow
 
 function OrderEntry({
+  isLimit,
   price,
   size,
   setPrice,
@@ -109,6 +151,7 @@ function OrderEntry({
   onLong,
   onShort,
 }: {
+  isLimit: boolean;
   price: string;
   size: string;
   setPrice: (v: string) => void;
@@ -118,22 +161,24 @@ function OrderEntry({
 }) {
   return (
     <div className="grid gap-3">
-      <LabelRow label="Price">
-        <div className="flex items-center gap-2">
-          <button className="rounded-full border p-2">
-            <MinusIcon className="size-4" />
-          </button>
-          <input
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="h-11 w-full rounded-xl border bg-background px-3 text-sm outline-none ring-0"
-            placeholder="Limit price"
-          />
-          <button className="rounded-full border p-2">
-            <PlusIcon className="size-4" />
-          </button>
-        </div>
-      </LabelRow>
+      {isLimit && (
+        <LabelRow label="Price (USDC)">
+          <div className="flex items-center gap-2">
+            <button className="rounded-full border p-2" onClick={() => setPrice((p) => String(Math.max(0, Number(p || 0) - 0.01)))}>
+              <MinusIcon className="size-4" />
+            </button>
+            <input
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="h-11 w-full rounded-xl border bg-background px-3 text-sm outline-none ring-0"
+              placeholder="Limit price"
+            />
+            <button className="rounded-full border p-2" onClick={() => setPrice((p) => String(Number(p || 0) + 0.01))}>
+              <PlusIcon className="size-4" />
+            </button>
+          </div>
+        </LabelRow>
+      )}
       <LabelRow label="Size">
         <input
           value={size}
@@ -142,52 +187,19 @@ function OrderEntry({
           placeholder="Order size"
         />
       </LabelRow>
-      <LabelRow label="Leverage">
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min={1}
-            max={25}
-            defaultValue={10}
-            className="w-full"
-          />
-          <div className="text-xs text-muted-foreground">10x</div>
-        </div>
-      </LabelRow>
       <div className="grid grid-cols-2 gap-2">
         <Button className="w-full" variant="success" onClick={onLong}>
-          Long
+          Buy
         </Button>
         <Button className="w-full" variant="danger" onClick={onShort}>
-          Short
+          Sell
         </Button>
       </div>
     </div>
   );
 }
 
-function Orderbook() {
-  return (
-    <div className="grid grid-cols-2 gap-2 text-xs">
-      <div className="grid gap-1">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={`ask-${i}`} className="flex items-center justify-between">
-            <span className="text-rose-500">24,103.{i}</span>
-            <span className="text-muted-foreground">12.3</span>
-          </div>
-        ))}
-      </div>
-      <div className="grid gap-1">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={`bid-${i}`} className="flex items-center justify-between">
-            <span className="text-emerald-500">24,102.{i}</span>
-            <span className="text-muted-foreground">9.{i}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+// removed orderbook mock for simplicity
 
 function Positions() {
   return (

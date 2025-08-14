@@ -17,23 +17,16 @@ export default function Page() {
     setPrivateKey,
     setWalletAddress,
     setTestnet,
-    setBuilderAddress,
-    setReferrerCode,
     connect,
     disconnect,
-    approveBuilderFee,
-    setReferrer,
     isConnected,
-    isWebSocketConnected,
     testnet,
     error,
   } = useHyperliquid();
 
   const [localPk, setLocalPk] = React.useState("");
   const [localWallet, setLocalWallet] = React.useState("");
-  const [localBuilder, setLocalBuilder] = React.useState("");
   const [localRef, setLocalRef] = React.useState("");
-  const [fee, setFee] = React.useState(10);
 
   return (
     <PwaSafeArea {...{ topNavHeight, bottomNavHeight }}>
@@ -120,72 +113,11 @@ export default function Page() {
                 </Button>
               )}
             </div>
-            <div className="text-xs text-muted-foreground">
-              Status: {isConnected ? "Connected" : "Disconnected"} • WS: {isWebSocketConnected ? "On" : "Off"}
-              {error ? ` • ${error}` : ""}
-            </div>
+            <div className="text-xs text-muted-foreground">Status: {isConnected ? "Connected" : "Disconnected"}{error ? ` • ${error}` : ""}</div>
           </div>
         </Panel>
 
-        <Panel title="Builder & Referrer">
-          <div className="grid gap-3 text-sm">
-            <div className="grid gap-1">
-              <label className="text-xs text-muted-foreground">Builder address</label>
-              <input
-                value={localBuilder}
-                onChange={(e) => setLocalBuilder(e.target.value)}
-                placeholder="0x..."
-                className="h-10 rounded-xl border bg-background px-3 text-sm outline-none"
-              />
-            </div>
-            <div className="grid gap-1">
-              <label className="text-xs text-muted-foreground">Max builder fee (tenths of a basis point)</label>
-              <input
-                type="number"
-                value={fee}
-                onChange={(e) => setFee(Number(e.target.value))}
-                className="h-10 w-40 rounded-xl border bg-background px-3 text-sm outline-none"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                onClick={async () => {
-                  setBuilderAddress(localBuilder || null);
-                  await approveBuilderFee(fee);
-                }}
-              >
-                Approve Builder Fee
-              </Button>
-            </div>
-            <div className="grid gap-1">
-              <label className="text-xs text-muted-foreground">Referrer code</label>
-              <input
-                value={localRef}
-                onChange={(e) => setLocalRef(e.target.value)}
-                placeholder="your-code"
-                className="h-10 rounded-xl border bg-background px-3 text-sm outline-none"
-              />
-              <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => setReferrerCode(localRef || null)}
-                >
-                  Set Code (local)
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={async () => {
-                    await setReferrer(localRef);
-                  }}
-                >
-                  Send SetReferrer
-                </Button>
-              </div>
-            </div>
-          </div>
-        </Panel>
+        {/* Builder/referrer controls removed for minimal non-agent app */}
 
         <Panel title="Links">
           <div className="flex items-center gap-2">
