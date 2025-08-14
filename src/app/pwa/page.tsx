@@ -164,7 +164,7 @@ function OrderEntry({
       {isLimit && (
         <LabelRow label="Price (USDC)">
           <div className="flex items-center gap-2">
-            <button className="rounded-full border p-2" onClick={() => setPrice((p) => String(Math.max(0, Number(p || 0) - 0.01)))}>
+            <button className="rounded-full border p-2" onClick={() => setPrice((p) => String(Math.max(0, Number(p ?? 0) - 0.01)))}>
               <MinusIcon className="size-4" />
             </button>
             <input
@@ -173,7 +173,7 @@ function OrderEntry({
               className="h-11 w-full rounded-xl border bg-background px-3 text-sm outline-none ring-0"
               placeholder="Limit price"
             />
-            <button className="rounded-full border p-2" onClick={() => setPrice((p) => String(Number(p || 0) + 0.01))}>
+            <button className="rounded-full border p-2" onClick={() => setPrice((p) => String(Number(p ?? 0) + 0.01))}>
               <PlusIcon className="size-4" />
             </button>
           </div>

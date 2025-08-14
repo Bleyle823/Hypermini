@@ -26,7 +26,7 @@ export default function Page() {
 
   const [localPk, setLocalPk] = React.useState("");
   const [localWallet, setLocalWallet] = React.useState("");
-  const [localRef, setLocalRef] = React.useState("");
+
 
   return (
     <PwaSafeArea {...{ topNavHeight, bottomNavHeight }}>
