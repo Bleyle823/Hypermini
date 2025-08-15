@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { usePrivy } from "@privy-io/react-auth";
 import { sdk } from "@farcaster/miniapp-sdk";
 import ConnectWallet from "@/components/ConnectWallet";
 import Trade from "@/components/Trade";
@@ -12,7 +12,7 @@ import Portfolio from "@/components/Portfolio";
 import BottomNavigation from "@/components/BottomNavigation";
 
 export default function Home() {
-  const { isConnected } = useAccount();
+  const { authenticated, ready } = usePrivy();
   const [activeTab, setActiveTab] = useState("trade");
   const [isReady, setIsReady] = useState(false);
 
@@ -33,7 +33,7 @@ export default function Home() {
   }, []);
 
   const renderContent = () => {
-    if (!isConnected) {
+    if (!ready || !authenticated) {
       return <ConnectWallet />;
     }
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { useAccount } from "wagmi";
+import { usePrivy } from "@privy-io/react-auth";
+import { useWallets } from "@privy-io/react-auth";
 import {
   Card,
   CardContent,
@@ -12,10 +13,14 @@ import { Button } from "@/components/ui/button";
 import useUserStore from "@/lib/store";
 
 export default function Profile() {
-  const { address, isConnected } = useAccount();
+  const { authenticated, user: privyUser, logout } = usePrivy();
+  const { wallets } = useWallets();
   const user = useUserStore((state) => state.user);
+  
+  const address = wallets.find(wallet => wallet.walletClientType === 'privy')?.address || 
+                  wallets[0]?.address;
 
-  if (!isConnected) {
+  if (!authenticated) {
     return (
       <div className="w-[400px]">
         <Card>
@@ -30,9 +35,60 @@ export default function Profile() {
 
   return (
     <div className="w-[400px] space-y-4">
+      {/* Farcaster Profile Card */}
+      {user?.farcasterUser && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Farcaster Profile</CardTitle>
+            <CardDescription>Your connected Farcaster account</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-3">
+              {user.farcasterUser.pfp && (
+                <img 
+                  src={user.farcasterUser.pfp} 
+                  alt="Profile" 
+                  className="w-12 h-12 rounded-full"
+                />
+              )}
+              <div>
+                <p className="font-medium">
+                  {user.farcasterUser.displayName || user.farcasterUser.username}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  @{user.farcasterUser.username}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  FID: {user.farcasterUser.fid}
+                </p>
+              </div>
+            </div>
+            
+            {user.farcasterUser.bio && (
+              <div>
+                <label className="text-sm font-medium">Bio</label>
+                <p className="text-sm text-muted-foreground">
+                  {user.farcasterUser.bio}
+                </p>
+              </div>
+            )}
+            
+            <div className="flex space-x-4 text-sm">
+              <span>
+                <strong>{user.farcasterUser.followerCount}</strong> followers
+              </span>
+              <span>
+                <strong>{user.farcasterUser.followingCount}</strong> following
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Trading Profile Card */}
       <Card>
         <CardHeader>
-          <CardTitle>Profile</CardTitle>
+          <CardTitle>Trading Profile</CardTitle>
           <CardDescription>Your Hyperliquid account details</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -61,8 +117,12 @@ export default function Profile() {
             </>
           )}
           
-          <Button variant="outline" className="w-full">
-            View Full Profile
+          <Button 
+            variant="outline" 
+            onClick={logout}
+            className="w-full"
+          >
+            Disconnect
           </Button>
         </CardContent>
       </Card>

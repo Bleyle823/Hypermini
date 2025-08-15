@@ -1,10 +1,22 @@
 import { create } from "zustand";
 
+interface FarcasterUser {
+  fid: number;
+  username?: string;
+  displayName?: string;
+  pfp?: string;
+  bio?: string;
+  followerCount?: number;
+  followingCount?: number;
+  verifications?: string[];
+}
+
 interface User {
   address: string;
   persistTradingConnection: boolean;
   builderFee: number;
   agent: Agent | null;
+  farcasterUser?: FarcasterUser;
 }
 
 interface Agent {

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { useAccount } from "wagmi";
+import { usePrivy } from "@privy-io/react-auth";
+import { useWallets } from "@privy-io/react-auth";
 import useUserStore from "@/lib/store";
 
 export default function UserProvider({
@@ -9,18 +10,26 @@ export default function UserProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const { address } = useAccount();
+  const { authenticated, user: privyUser, ready } = usePrivy();
+  const { wallets } = useWallets();
   const user = useUserStore((state) => state.user);
   const login = useUserStore((state) => state.login);
   const logout = useUserStore((state) => state.logout);
 
+  // Get the primary wallet address
+  const address = wallets.find(wallet => wallet.walletClientType === 'privy')?.address || 
+                  wallets[0]?.address;
+
   useEffect(() => {
-    if (address) {
-      const user = localStorage.getItem(`test_spot_trader.user_${address}`);
-      const userData = user ? JSON.parse(user) : null;
+    if (!ready) return;
+    
+    if (authenticated && address && privyUser) {
+      const storedUser = localStorage.getItem(`test_spot_trader.user_${address}`);
+      const userData = storedUser ? JSON.parse(storedUser) : null;
 
       login({
         address,
+        farcasterUser: privyUser.farcaster,
         persistTradingConnection: userData?.persistTradingConnection
           ? userData?.persistTradingConnection === "true"
           : false,
@@ -30,11 +39,11 @@ export default function UserProvider({
     } else {
       logout();
     }
-  }, [address]);
+  }, [authenticated, address, privyUser, ready, login, logout]);
 
   useEffect(() => {
-    console.log({ user });
-  }, [user]);
+    console.log({ user, privyUser, authenticated, address });
+  }, [user, privyUser, authenticated, address]);
 
   return <>{children}</>;
 }

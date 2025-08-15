@@ -6,19 +6,21 @@ A Next.js-based boilerplate for building decentralized spot trading applications
 
 ## Features
 
-- 🔐 Secure wallet connection using AppKit
+- 🔐 Secure authentication using Farcaster via Privy
 - 💱 Spot trading interface for buying and selling tokens
 - 🤝 Builder fee approval system
 - 🔑 Agent-based trading system
 - 🎨 Modern UI using shadcn/ui components
 - 🌙 Dark mode support
 - 🔄 Real-time price and balance updates
+- 🎭 Farcaster profile integration
 
 ## Tech Stack
 
 - **Framework**: Next.js 15
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
+- **Authentication**: Privy (Farcaster integration)
 - **Web3**:
   - Wagmi
   - Viem
@@ -40,6 +42,9 @@ pnpm install
 3. Set up environment variables:
 
 ```env
+# Privy App ID (get from https://dashboard.privy.io/apps)
+NEXT_PUBLIC_PRIVY_APP_ID=your_privy_app_id_here
+
 # The environment mode (development/production)
 NEXT_PUBLIC_NODE_ENV=development
 
@@ -52,8 +57,8 @@ NEXT_PUBLIC_BUILDER_ADDRESS=your_builder_address
 # The builder fee percentage (in basis points)
 NEXT_PUBLIC_BUILDER_FEE=10
 
-# The WalletConnect project ID for wallet connections
-NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_wallet_connect_project_id
+# WalletConnect Project ID (optional, for fallback wallet connections)
+NEXT_PUBLIC_PROJECT_ID=your_walletconnect_project_id
 ```
 
 4. Run the development server:
@@ -64,9 +69,14 @@ pnpm dev
 
 ## Core Components
 
-### Wallet Connection
+### Farcaster Authentication
 
-The wallet connection is handled through AppKit integration, providing a seamless connection experience
+The authentication is handled through Privy's Farcaster integration, providing:
+
+- **Sign in with Farcaster**: Users authenticate using their Farcaster account
+- **Embedded Wallets**: Automatic wallet creation for users without existing wallets
+- **Profile Integration**: Display Farcaster profile information including username, bio, and follower counts
+- **Secure Authentication**: Leverages Farcaster's decentralized identity system
 
 ### Trading Interface
 
