@@ -1,0 +1,22 @@
+{
+  "name": "Hyperliquid Trading",
+  "short_name": "Hyperliquid",
+  "description": "Trade on Hyperliquid DEX directly from Farcaster",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ],
+  "fc:miniapp": {
+    "version": "1.0.0",
+    "permissions": [
+      "wallet"
+    ]
+  }
+}

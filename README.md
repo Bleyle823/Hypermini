@@ -1,99 +1,98 @@
-# Farcaster Mini App Template
+# Sovrun create-builder-codes-dapp boilerplate
 
-This is a [Next.js](https://nextjs.org) starter kit to boostrap your Farcaster Mini App
+![Preview](./assets/preview.png)
 
-- [Farcaster Mini Apps](https://miniapps.xyz)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Next.js](https://nextjs.org/docs)
-- [Neynar](https://neynar.com)
+A Next.js-based boilerplate for building decentralized spot trading applications on Hyperliquid utilizing [Builder Codes](https://hyperliquid.gitbook.io/hyperliquid-docs/trading/builder-codes). This project provides a foundation for creating web3 trading interfaces with essential features like wallet connection, builder fee approval, agent creation, and gas-free order execution. The sample dapp provided allows for basic swap routing on Hyperliquid L1.
+
+## Features
+
+- 🔐 Secure wallet connection using AppKit
+- 💱 Spot trading interface for buying and selling tokens
+- 🤝 Builder fee approval system
+- 🔑 Agent-based trading system
+- 🎨 Modern UI using shadcn/ui components
+- 🌙 Dark mode support
+- 🔄 Real-time price and balance updates
+
+## Tech Stack
+
+- **Framework**: Next.js 15
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Web3**:
+  - Wagmi
+  - Viem
+  - Ethers.js
+- **State Management**: Zustand
+- **Data Fetching**: TanStack Query
+- **UI Components**: shadcn/ui
+- **Package Manager**: pnpm
 
 ## Getting Started
 
-1. Install dependencies:
+1. Clone the repository
+2. Install dependencies:
 
 ```bash
-npm install
-# or
-yarn install
-# or
 pnpm install
-# or
-bun install
 ```
 
-2. Verify environment variables:
+3. Set up environment variables:
 
-The environment variables enable the following features:
+```env
+# The environment mode (development/production)
+NEXT_PUBLIC_NODE_ENV=development
 
-- Frame metadata - Sets up the Frame Embed that will be shown when you cast your frame
-- Account assocation - Allows users to add your frame to their account, enables notifications
-- Redis API keys - Enable Webhooks and background notifications for your application by storing users notification details
+# The RPC URL for connecting to the Hyperliquid testnet
+NEXT_PUBLIC_RPC_URL=your_rpc_url
+
+# The builder's wallet address for fee collection
+NEXT_PUBLIC_BUILDER_ADDRESS=your_builder_address
+
+# The builder fee percentage (in basis points)
+NEXT_PUBLIC_BUILDER_FEE=10
+
+# The WalletConnect project ID for wallet connections
+NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_wallet_connect_project_id
+```
+
+4. Run the development server:
 
 ```bash
-# Required for Frame metadata
-NEXT_PUBLIC_URL=
-
-# Required to allow users to add your frame
-NEXT_PUBLIC_FARCASTER_HEADER=
-NEXT_PUBLIC_FARCASTER_PAYLOAD=
-NEXT_PUBLIC_FARCASTER_SIGNATURE=
-
-# Required for user authentication
-NEYNAR_API_KEY=
-JWT_SECRET=
-
-# Required for webhooks and background notifications
-REDIS_URL=
-REDIS_TOKEN=
+pnpm dev
 ```
 
-3. Start the development server:
+## Core Components
 
-```bash
-npm run dev
-```
+### Wallet Connection
 
-4. Run a local tunneling server
+The wallet connection is handled through AppKit integration, providing a seamless connection experience
 
-- [NGROK](https://ngrok.com)
-- [Local Tunnel](https://theboroer.github.io/localtunnel-www/)
+### Trading Interface
 
-5. Generate your Farcaster Manifest variables
+The trading interface supports both buying and selling with features like:
 
-- Follow these [instructions](https://miniapps.farcaster.xyz/docs/guides/publishing)
-- Visit [Manifest Tool](https://warpcast.com/~/developers/mini-apps/manifest)
-- Paste your tunnel domain
+- Current token price
+- Balance checking
+- Slippage control
+- Order execution
 
-## Template Features
+### Builder Fee Approval
 
-### Frame Configuration
+Users need to approve builder fees before trading.
 
-- `.well-known/farcaster.json` endpoint configured for Frame metadata and account association
-- Frame metadata automatically added to page headers in `layout.tsx`
+### Agent System
 
-### Background Notifications
+The platform uses an agent-based system for gas-free trading.
 
-- Redis-backed notification system using Upstash
-- Ready-to-use notification endpoints in `api/notify` and `api/webhook`
-- Notification client utilities in `lib/notification-client.ts`
+## Contributing
 
-### MiniApp Provider
+Contributions are welcome! Guidelines currently being drafted, please feel free to coordinate with us for reviewing PRs.
 
-The app is wrapped with `MiniAppProvider` in `providers.tsx`, configured with:
+## License
 
-- Access to Mini App context
-- Sets up Wagmi Connectors
-- Sets up Mini App SDK listeners
-- Applies Safe Area Insets
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-### Dynamic Preview Images
+## Support
 
-- `dynamic-image-example/[id]/page.tsx` show how to create a Mini App URL resolving to a custom preview image
-- `api/og/example/[id]/route.ts` shows how to generate a custom preview image
-
-## Learn More
-
-- [Farcaster Mini Apps](https://miniapps.xyz)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Neynar](https://neynar.com)
+For support, please open an issue in the GitHub repository, reach out to the Hyperliquid community, or visit the Sovrun discord.
