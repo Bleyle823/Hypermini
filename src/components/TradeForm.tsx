@@ -233,12 +233,54 @@ export default function TradeForm({ type }: TradeFormProps) {
     if (!address || !user?.agent?.privateKey) {
       toast({
         title: "Error",
-        description: "Please connect your wallet",
+        description: "Please connect your wallet and approve your agent first",
+        variant: "destructive",
       });
       return;
     }
 
-    submitOrder(new FormData(e.currentTarget));
+    // Additional validation
+    if (!midPriceData || midPriceData <= 0) {
+      toast({
+        title: "Error",
+        description: "Unable to fetch current market price. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!tokenDetails) {
+      toast({
+        title: "Error",
+        description: "Unable to fetch token details. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formData = new FormData(e.currentTarget);
+    const amount = formData.get("amount") as string;
+    
+    if (!amount || parseFloat(amount) <= 0) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid amount",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if user has completed all prerequisites
+    if (!user.builderFee) {
+      toast({
+        title: "Prerequisite Required",
+        description: "Please approve builder fees before trading",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    submitOrder(formData);
   };
 
   return (
