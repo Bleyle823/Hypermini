@@ -81,13 +81,13 @@ export default function TradeForm({ type }: TradeFormProps) {
       }
 
       // Validate USDC balance for buy orders
-      if (isBuy && parseFloat(amount) > userBalances.usdc) {
-        throw new Error(`Insufficient USDC balance. You have ${userBalances.usdc} USDC`);
+      if (isBuy && parseFloat(amount) > (userBalances.usdc || 0)) {
+        throw new Error(`Insufficient USDC balance. You have ${userBalances.usdc || 0} USDC`);
       }
 
       // Validate HYPE balance for sell orders
-      if (!isBuy && parseFloat(amount) > userBalances.hype) {
-        throw new Error(`Insufficient HYPE balance. You have ${userBalances.hype} HYPE`);
+      if (!isBuy && parseFloat(amount) > (userBalances.hype || 0)) {
+        throw new Error(`Insufficient HYPE balance. You have ${userBalances.hype || 0} HYPE`);
       }
 
       console.log("Submitting order with:", {
@@ -198,12 +198,14 @@ export default function TradeForm({ type }: TradeFormProps) {
 
   // Derived State
   const userBalances = {
-    usdc:
+    usdc: Number(
       balanceData?.balances?.find((balance) => balance.coin === "USDC")
-        ?.total ?? 0,
-    hype:
+        ?.total ?? 0
+    ),
+    hype: Number(
       balanceData?.balances?.find((balance) => balance.coin === "HYPE")
-        ?.total ?? 0,
+        ?.total ?? 0
+    ),
   };
 
   // Handlers
