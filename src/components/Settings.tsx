@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import ConfigurationChecker from "./ConfigurationChecker";
 
 export default function Settings() {
   return (
@@ -73,6 +74,8 @@ export default function Settings() {
           </Button>
         </CardContent>
       </Card>
+
+      <ConfigurationChecker />
     </div>
   );
 }

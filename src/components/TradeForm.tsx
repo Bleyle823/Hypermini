@@ -75,6 +75,30 @@ export default function TradeForm({ type }: TradeFormProps) {
       const slippage =
         parseFloat(formData.get("slippage") as string) / 100 || 0;
 
+      // Validate amount
+      if (!amount || parseFloat(amount) <= 0) {
+        throw new Error("Please enter a valid amount");
+      }
+
+      // Validate USDC balance for buy orders
+      if (isBuy && parseFloat(amount) > userBalances.usdc) {
+        throw new Error(`Insufficient USDC balance. You have ${userBalances.usdc} USDC`);
+      }
+
+      // Validate HYPE balance for sell orders
+      if (!isBuy && parseFloat(amount) > userBalances.hype) {
+        throw new Error(`Insufficient HYPE balance. You have ${userBalances.hype} HYPE`);
+      }
+
+      console.log("Submitting order with:", {
+        amount,
+        isBuy,
+        slippage,
+        midPrice: midPriceData,
+        tokenDecimals: tokenDetails.szDecimals,
+        userBalances
+      });
+
       const order = constructOrder({
         amount,
         isBuy,
@@ -83,60 +107,91 @@ export default function TradeForm({ type }: TradeFormProps) {
         tokenDecimals: tokenDetails.szDecimals,
       });
 
+      console.log("Constructed order:", order);
+
       return submitMarketOrder(order, user.agent.privateKey);
     },
     onSuccess: async (res) => {
+      console.log("Order submission response:", res);
+      
       if (res?.status === "ok") {
         const statuses: { [key: string]: string }[] =
           res?.response?.data?.statuses;
 
-        statuses.forEach(async (status) => {
-          if (status?.error) {
-            toast({
-              title: "Something went wrong",
-              description: status.error,
-            });
-          } else if (status?.filled) {
-            toast({
-              title: "Success",
-              description: "Order submitted successfully",
-            });
+        if (statuses && statuses.length > 0) {
+          statuses.forEach(async (status) => {
+            if (status?.error) {
+              toast({
+                title: "Order Error",
+                description: status.error,
+                variant: "destructive",
+              });
+            } else if (status?.filled) {
+              toast({
+                title: "Success",
+                description: "Order submitted successfully",
+              });
 
-            // Reset form
-            formRef.current?.reset();
-            setFormState({ amount: "", slippage: DEFAULT_SLIPPAGE });
-            setTotalAmount(0);
+              // Reset form
+              formRef.current?.reset();
+              setFormState({ amount: "", slippage: DEFAULT_SLIPPAGE });
+              setTotalAmount(0);
 
-            // Revalidate queries
-            await Promise.all([
-              queryClient.invalidateQueries({
-                queryKey: ["balances", address],
-              }),
-              queryClient.invalidateQueries({
-                queryKey: ["midPrice", "@1035"],
-              }),
-              queryClient.invalidateQueries({
-                queryKey: [
-                  "tokenDetails",
-                  "0x7317beb7cceed72ef0b346074cc8e7ab",
-                ],
-              }),
-            ]);
-          }
-        });
+              // Revalidate queries
+              await Promise.all([
+                queryClient.invalidateQueries({
+                  queryKey: ["balances", address],
+                }),
+                queryClient.invalidateQueries({
+                  queryKey: ["midPrice", "@1035"],
+                }),
+                queryClient.invalidateQueries({
+                  queryKey: [
+                    "tokenDetails",
+                    "0x7317beb7cceed72ef0b346074cc8e7ab",
+                  ],
+                }),
+              ]);
+            }
+          });
+        } else {
+          toast({
+            title: "Success",
+            description: "Order submitted successfully",
+          });
+          
+          // Reset form
+          formRef.current?.reset();
+          setFormState({ amount: "", slippage: DEFAULT_SLIPPAGE });
+          setTotalAmount(0);
+        }
       } else {
-        console.log("res", res);
+        console.error("Order submission failed:", res);
+        const errorMessage = res?.response?.data?.error || res?.error || "Failed to submit order";
         toast({
-          title: "Error",
-          description: "Failed to submit order",
+          title: "Order Failed",
+          description: errorMessage,
+          variant: "destructive",
         });
       }
     },
     onError: (error) => {
       console.error("Error submitting order:", error);
+      
+      let errorMessage = "Failed to submit order";
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error && typeof error === 'object' && 'message' in error) {
+        errorMessage = String(error.message);
+      }
+      
       toast({
-        title: "Error",
-        description: "Failed to submit order",
+        title: "Order Error",
+        description: errorMessage,
+        variant: "destructive",
       });
     },
   });
