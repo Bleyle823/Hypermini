@@ -14,3 +14,8 @@ export const config = createConfig({
     [arbitrumSepolia.id]: http(),
   },
 });
+
+// Minimal adapter shape expected by callers
+export const wagmiAdapter = {
+  wagmiConfig: config,
+};

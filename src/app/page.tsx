@@ -64,14 +64,14 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Wallet Connection Section - Centered */}
-      {!isConnected && (
+      {!authenticated && (
         <div className="flex items-center justify-center pt-20 px-6">
           {renderContent()}
         </div>
       )}
 
       {/* Main Content */}
-      {isConnected && (
+      {authenticated && (
         <>
           <div className="flex justify-center px-6 pt-6 pb-20">
             {renderContent()}
