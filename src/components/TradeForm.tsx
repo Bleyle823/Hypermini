@@ -303,6 +303,14 @@ export default function TradeForm({ type }: TradeFormProps) {
             </dd>
           </dl>
         </CardDescription>
+        
+        {/* Helpful trading guide */}
+        <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+          <p className="text-xs text-blue-700 dark:text-blue-300">
+            <strong>Trading Guide:</strong> Ensure you have sufficient balance and the current market price is available. 
+            Minimum order size is 0.001 HYPE. Check the console (F12) for detailed error information if orders fail.
+          </p>
+        </div>
       </CardHeader>
 
       <CardContent>
