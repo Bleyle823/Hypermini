@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useAccount, useBalance, useDisconnect, useChainId } from "wagmi";
-import { useCopyToClipboard } from "@/hooks/use-toast";
 import {
   Card,
   CardContent,
