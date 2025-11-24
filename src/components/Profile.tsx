@@ -9,10 +9,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { CheckCircle2, XCircle, ExternalLink } from "lucide-react";
 import useUserStore from "@/lib/store";
+import WalletInfo from "@/components/WalletInfo";
 
 export default function Profile() {
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const user = useUserStore((state) => state.user);
 
   if (!isConnected) {
@@ -30,39 +33,70 @@ export default function Profile() {
 
   return (
     <div className="w-[400px] space-y-4">
+      {/* Wallet Information */}
+      <WalletInfo />
+
+      {/* Trading Account Details */}
       <Card>
         <CardHeader>
-          <CardTitle>Profile</CardTitle>
-          <CardDescription>Your Hyperliquid account details</CardDescription>
+          <CardTitle>Trading Account</CardTitle>
+          <CardDescription>Your Hyperliquid trading permissions</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <label className="text-sm font-medium">Wallet Address</label>
-            <p className="text-sm text-muted-foreground font-mono">
-              {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "Not connected"}
-            </p>
-          </div>
-          
           {user && (
             <>
-              <div>
-                <label className="text-sm font-medium">Builder Fee Status</label>
-                <p className="text-sm text-muted-foreground">
-                  {user.builderFee ? "✅ Approved" : "❌ Not Approved"}
-                </p>
+              <div className="flex items-center justify-between p-3 bg-muted rounded-md">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Builder Fee Status</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {user.builderFee ? (
+                    <>
+                      <CheckCircle2 className="h-4 w-4 text-green-500" />
+                      <span className="text-sm text-green-500">Approved</span>
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="h-4 w-4 text-destructive" />
+                      <span className="text-sm text-destructive">Not Approved</span>
+                    </>
+                  )}
+                </div>
               </div>
               
-              <div>
-                <label className="text-sm font-medium">Agent Status</label>
-                <p className="text-sm text-muted-foreground">
-                  {user.agent ? "✅ Approved" : "❌ Not Approved"}
-                </p>
+              <div className="flex items-center justify-between p-3 bg-muted rounded-md">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Agent Status</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {user.agent ? (
+                    <>
+                      <CheckCircle2 className="h-4 w-4 text-green-500" />
+                      <span className="text-sm text-green-500">Approved</span>
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="h-4 w-4 text-destructive" />
+                      <span className="text-sm text-destructive">Not Approved</span>
+                    </>
+                  )}
+                </div>
               </div>
             </>
           )}
           
-          <Button variant="outline" className="w-full">
-            View Full Profile
+          <Separator />
+          
+          <Button variant="outline" className="w-full" asChild>
+            <a
+              href="https://hyperliquid.xyz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2"
+            >
+              <span>View on Hyperliquid</span>
+              <ExternalLink className="h-4 w-4" />
+            </a>
           </Button>
         </CardContent>
       </Card>
