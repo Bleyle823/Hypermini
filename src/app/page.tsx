@@ -10,6 +10,7 @@ import Settings from "@/components/Settings";
 import About from "@/components/About";
 import Portfolio from "@/components/Portfolio";
 import BottomNavigation from "@/components/BottomNavigation";
+import Header from "@/components/Header";
 
 export default function Home() {
   const { isConnected } = useAccount();
@@ -63,6 +64,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Header with Wallet Status */}
+      <Header />
+
       {/* Wallet Connection Section - Centered */}
       {!isConnected && (
         <div className="flex items-center justify-center pt-20 px-6">
